@@ -17,3 +17,7 @@ In this project, it is assumed that the input image may not be in the best persp
 ### OCR
 
 Since we have an image with better resolution and we know the document's template, we apply Optical Character Recognition to it by using **pytesseract** API.
+
+### Web Application
+
+We also have a web application developed with **Flask**, so the user can upload an image of the document and then the text information contained within is displayed on the screen.
