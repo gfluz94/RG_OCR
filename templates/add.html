@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1 class="display-4">Upload ID Document</h1>
+    <br>
+    <form method="POST" role="form" class="form">
+        {{form.hidden_tag()}}
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.rg.label}}</strong></label>
+            <br>
+            {{ form.rg() }}
+        </div>
+        <br>
+        {{form.submit()}}
+    </form>
+</div>
+
+{% endblock %}

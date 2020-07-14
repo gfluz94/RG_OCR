@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1 class="display-4">Data - ID Document</h1>
+    <br>
+    <form method="POST" role="form" class="form">
+        {{form.hidden_tag()}}
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.rg.label}}</strong></label>
+            {{ form.rg(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.exped.label}}</strong></label>
+            {{ form.exped(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.cpf.label}}</strong></label>
+            {{ form.cpf(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.name.label}}</strong></label>
+            {{ form.name(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.bdate.label}}</strong></label>
+            {{ form.bdate(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.city.label}}</strong></label>
+            {{ form.city(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.state.label}}</strong></label>
+            {{ form.state(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.mother.label}}</strong></label>
+            {{ form.mother(class="form-control",id="email",required="required",type="text") }}
+        </div>
+        <div class="form-group  required">
+            <label class="control-label" for="email"><strong>{{form.father.label}}</strong></label>
+            {{ form.father(class="form-control",id="email",required="required",type="text") }}
+        </div>
+    </form>
+</div>
+
+{% endblock %}
