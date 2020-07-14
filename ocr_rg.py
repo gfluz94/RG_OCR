@@ -1,3 +1,4 @@
+import re
 import cv2
 import numpy as np
 import pytesseract
@@ -71,6 +72,8 @@ class ImageDewarper(object):
 
     def run(self, img_path):
         img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+        while max(img.shape)>2000:
+            img = cv2.pyrDown(img)
         preproc_img = self.__preprocess_img(img)
         contour = self.__get_contour(preproc_img)
         mask = self.__generate_mask(img, contour)
@@ -124,14 +127,14 @@ class RGReader(object):
         return self.__output_size
 
     def __get_coords(self):
-        nrg_xy = [(67, 35), (204, 85)]
-        exped_xy = [(406, 35), (538, 85)]
-        nome_xy = [(21, 102), (566, 139)]
-        mae_xy = [(21, 188), (566, 228)]
-        pai_xy = [(21, 231), (566, 268)]
-        natal_xy = [(21, 309), (394, 352)]
-        nasc_xy = [(406, 309), (538, 352)]
-        cpf_xy = [(20, 463), (188, 502)]
+        nrg_xy = [(87, 35), (252, 96)]
+        exped_xy = [(400, 35), (540, 96)]
+        nome_xy = [(21, 131), (566, 173)]
+        mae_xy = [(21, 238), (566, 270)]
+        pai_xy = [(21, 206), (566, 234)]
+        natal_xy = [(21, 305), (394, 357)]
+        nasc_xy = [(406, 305), (558, 357)]
+        cpf_xy = [(20, 483), (188, 532)]
         coords_default = [nrg_xy, exped_xy, nome_xy , mae_xy, pai_xy, nasc_xy , cpf_xy, natal_xy]
         coords = []
         for ((x1, y1), (x2, y2)) in coords_default:
@@ -142,19 +145,49 @@ class RGReader(object):
             coords.append([(x1, y1), (x2, y2)])
         return coords
 
+    def __postprocess_num(self, field):
+        output = re.sub(r"[^\d|\-|\/]", "", field)
+        output = re.sub(r"/", "-", output)
+        if "-" in output:
+            preffix = output.split("-")[0]
+            suffix = "-"+output.split("-")[-1]
+        else:
+            preffix = output
+            suffix = ""
+        out_pre = ""
+        for i, digit in enumerate(preffix[::-1]):
+            if i%3==0:
+                out_pre+="."
+            out_pre+=digit
+        out_pre = out_pre[::-1].strip(".")
+        return out_pre+suffix
+
+    def __postprocess_location(self, field):
+        field = re.sub(r",", ".", field)
+        field = re.sub(r"=", "-", field)
+        try:
+            city, state = field.split("-")
+            city = city.strip()
+            state = self.UF_TO_STATE[state.strip()].upper()
+        except:
+            city = field
+            state = ''
+        return city, state
+
     def read_img(self, img_path):
         target_img = self.__dewarper.run(img_path)
         info_extracted = {}
         for field, ((x1, y1), (x2, y2)) in zip(self.FIELDS, self.COORDS):
             roi = target_img[y1:y2, x1:x2]
-            info_extracted[field] = self.__tesseract.image_to_string(roi)
-        info_extracted["UF_ORIGEM"] = info_extracted["CIDADE_ORIGEM"].split("-")[-1]
-        info_extracted["UF_ORIGEM"] = self.UF_TO_STATE[info_extracted["UF_ORIGEM"]].upper()
-        info_extracted["CIDADE_ORIGEM"] = info_extracted["CIDADE_ORIGEM"].split("-")[0]
+            info_extracted[field] = self.__tesseract.image_to_string(roi).strip()
+        info_extracted["RG"] = self.__postprocess_num(info_extracted["RG"])
+        info_extracted["CPF"] = self.__postprocess_num(info_extracted["CPF"])
+        info_extracted["CIDADE_ORIGEM"], info_extracted["UF_ORIGEM"] = self.__postprocess_location(info_extracted["CIDADE_ORIGEM"])
         return info_extracted
 
 
 if __name__ == "__main__":
     dewarper = ImageDewarper(blur_ksize=5, threshold_value=195, dilation_ksize=5, output_size=600)
     rg_reader = RGReader(dewarper)
-    output_rg = rg_reader.read_img("rg.jpg")
+    output_rg = rg_reader.read_img("nuria.jpg")
+    print(output_rg)
